@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,10 @@ public class WomenPage extends BasePage{
     public static  String SELECTED_COLOR;
     public static  String SELECTED_PRICE_RANGE;
     public static  int PRODUCT_NUMBER;
-    public static Map<String,Boolean> ADD_TO_WISH_LIST_MESSAGE;
+    public static  int PRODUCT_NUMBER_ADDED_IN_WISH_LIST;
+    public static Map<String,Boolean> SUCCESS_MESSAGE;
+
+    public static String ITEM_SIZE="//li[@class='item product product-item'][%s]//div[@class='swatch-option text']";
 
 
     @FindBy(xpath = "//span[.='Tops']/../../a[@id='ui-id-9']")
@@ -35,13 +39,29 @@ public class WomenPage extends BasePage{
     @FindBy(xpath = "//span[@class='price']/../../a")
     private List<WebElement> shoppingOptionsPriceList;
     @FindBy(xpath = "//div[@class='product details product-item-details']//span[@data-price-type='finalPrice']/span")
-    private List<WebElement> productPrice;
-    @FindBy(css = "li[class='item product product-item']")
+    public List<WebElement> productPrice;
+    @FindBy(xpath = "//ol[@class='products list items product-items']/li[@class='item product product-item']")
     private List<WebElement> productList;
     @FindBy(xpath = "//span[.='Price']/../a")
     private WebElement removePriceFilterButton;
     @FindBy(css = "a[title='Add to Wish List']")
     private List<WebElement> addToWishButton;
+    @FindBy(xpath = "//*[@data-ui-id='message-success']/div")
+    public static WebElement itemAddedToWishListMessage;
+    @FindBy(xpath = "//*[@data-ui-id='message-success']//a")
+    public static WebElement continueShoppingButton;
+    @FindBy(xpath = "//li[@class='item product product-item']//button[@title='Add to Cart']")
+    public static List<WebElement> addToCartButton;
+    @FindBy(xpath = "//*[@data-ui-id='message-success']/div")
+    public static WebElement addToCartSuccessMessage;
+    @FindBy(xpath = "//*[@data-ui-id='message-success']//a")
+    public static WebElement shoppingCartLink;
+    @FindBy(xpath = "//div[@class='toolbar toolbar-products' and following-sibling::div[@class='products wrapper grid products-grid']]//select[@id='sorter']")
+    private   WebElement sortElement;
+    @FindBy(xpath = "//li[@class='item product product-item']//a[@class='product-item-link']")
+    public static List<WebElement> productName;
+    @FindBy(xpath = "//div[@class='toolbar toolbar-products' and following-sibling::div[@class='products wrapper grid products-grid']]//a[@title='Set Descending Direction']")
+    public static WebElement buttonForDescendingOrder;
 
 
 
@@ -125,14 +145,85 @@ public class WomenPage extends BasePage{
     }
 
     public void addTwoProductsInWishList(){
-        ADD_TO_WISH_LIST_MESSAGE=new HashMap<>();
-        for (int i = 0; i < 2; i++) {
+        SUCCESS_MESSAGE=new HashMap<>();
+        int productsToAddInToWishList=2;
+        PRODUCT_NUMBER_ADDED_IN_WISH_LIST=productsToAddInToWishList;
+        for (int i = 0; i < productsToAddInToWishList; i++) {
             BrowserUtils.hover(productList.get(i));
             clickElement(addToWishButton.get(i));
-            ADD_TO_WISH_LIST_MESSAGE.put(((i+1)+". item"),MyWishListPage.itemAddedToWishListMessage.isDisplayed());
-            clickElement(MyWishListPage.continueShoppingButton);
+            SUCCESS_MESSAGE.put(((i+1)+". item"),itemAddedToWishListMessage.isDisplayed());
+            clickElement(continueShoppingButton);
         }
     }
+
+    public void addItemsToCart(){
+        SUCCESS_MESSAGE=new HashMap<>();
+        PRODUCT_NUMBER=productList.size();
+        for (int i = 0; i < productList.size(); i++) {
+            BrowserUtils.hover(productList.get(i));
+           List<WebElement> sizeList= BrowserUtils.getListOfElements(ITEM_SIZE,(i+1)+"");
+           int randomSizeIndex=BrowserUtils.selectARandomNumber(0,sizeList.size()-1);
+           clickElement(sizeList.get(randomSizeIndex));
+            BrowserUtils.hover(productList.get(i));
+            clickElement(addToCartButton.get(i));
+            SUCCESS_MESSAGE.put(((i+1)+". item"),addToCartSuccessMessage.isDisplayed());
+        }
+    }
+
+    public void checkThatSuccessMessageIsDisplayed(){
+        for (String eachMessage : WomenPage.SUCCESS_MESSAGE.keySet()) {
+            Assert.assertTrue("Success message is not displayed for "+eachMessage, WomenPage.SUCCESS_MESSAGE.get(eachMessage));
+        }
+    }
+
+    public void clickShoppingCartLinkInSuccessMEssage(){
+        clickElement(shoppingCartLink);
+    }
+
+    public void selectGivenDropdown(String sortingType){
+        if (sortingType.equalsIgnoreCase("name")) {
+            BrowserUtils.selectFromDropDown(sortElement, "name");
+        }else {
+            BrowserUtils.selectFromDropDown(sortElement, "price");
+        }
+    }
+
+    public void checkItemsAreListedInAscendingOrder(String sortingType){
+        if (sortingType.equalsIgnoreCase("name")) {
+            List<String> itemNames=BrowserUtils.getElementsText(productName);
+            Assert.assertTrue("Item name are not in ascending order", BrowserUtils.checkIfListIsInAscendingOrder(itemNames));
+        }else {
+            List<String> itemPricestr=BrowserUtils.getElementsText(productPrice);
+            List<Double> itemPricedouble=new ArrayList<>();
+            for (String eachItem : itemPricestr) {
+                itemPricedouble.add(Double.parseDouble(eachItem.substring(1)));
+            }
+            Assert.assertTrue("Item name are not in ascending order", BrowserUtils.isAscendingOrder(itemPricedouble));
+        }
+    }
+    public void clickButtonForDescendinOrder(){
+        clickElement(buttonForDescendingOrder);
+    }
+
+    public void checkItemsAreListedInDescendingOrder(){
+        List<String> itemNames=BrowserUtils.getElementsText(productName);
+        Assert.assertTrue("Item name are not in descending order",BrowserUtils.isDescendingOrder(itemNames));
+    }
+
+    public void checkItemsAreListedInDescendingOrder(String sortingType){
+        if (sortingType.equalsIgnoreCase("name")) {
+            List<String> itemNames=BrowserUtils.getElementsText(productName);
+            Assert.assertTrue("Item name are not in descending order",BrowserUtils.isDescendingOrder(itemNames));
+        }else {
+            List<String> itemPricestr=BrowserUtils.getElementsText(productPrice);
+            List<Double> itemPricedouble=new ArrayList<>();
+            for (String eachItem : itemPricestr) {
+                itemPricedouble.add(Double.parseDouble(eachItem.substring(1)));
+            }
+            Assert.assertTrue("Item name are not in descending order", BrowserUtils.isDescendingOrderForDouble(itemPricedouble));
+        }
+    }
+
 
 
 }

@@ -8,7 +8,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-public class test {
+public class Login_Step_Definition {
 
     @When("the user click create an account link")
     public void the_user_click_create_an_account_link() {
@@ -89,4 +89,9 @@ public class test {
         loginPage.clickLogInButton();
     }
 
+    @Given("The user verifies if is not logged in")
+    public void theUserVerifiesIfIsNotLoggedIn() {
+        LoginPage loginPage=new LoginPage();
+        loginPage.checkIfIsLoggedOut();
+    }
 }

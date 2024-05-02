@@ -1,5 +1,8 @@
-
+@wip
   Feature: tests
+
+    Background:
+      Given The user verifies if is not logged in
 
     @create_account
     Scenario: Create an account

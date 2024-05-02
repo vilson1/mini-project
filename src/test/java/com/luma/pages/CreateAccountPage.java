@@ -1,6 +1,5 @@
 package com.luma.pages;
 
-import com.luma.constants.GlobalValues;
 import com.luma.utilities.BrowserUtils;
 import com.luma.utilities.ConfigurationReader;
 import com.luma.utilities.Driver;
