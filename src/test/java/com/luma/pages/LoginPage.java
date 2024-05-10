@@ -16,6 +16,8 @@ public class LoginPage extends BasePage{
     private WebElement passwordInputField;
     @FindBy (xpath = "//button[@class='action login primary']")
     private WebElement loginButton;
+    @FindBy(xpath = "//ul[@class='header links' and preceding-sibling::a[@class='action skip contentarea']]//a[contains(.,'Sign In')]")
+    public static WebElement logInButton;
     @FindBy(xpath = "//a[@class='action skip contentarea']/..//div[@class='customer-menu']//a[contains(.,'Sign Out')]")
     private WebElement signOutButton;
 
@@ -34,7 +36,7 @@ public class LoginPage extends BasePage{
 
     public void checkIfIsLoggedOut() {
         try {
-            HomePage.logInButton.isDisplayed();
+            logInButton.isDisplayed();
         } catch (Exception e) {
             clickElement(HomePage.accountButton);
             clickElement(signOutButton);

@@ -1,10 +1,10 @@
 @wip
-  Feature: tests
+  Feature: login
 
     Background:
       Given The user verifies if is not logged in
 
-    @create_account
+    @create_account @wip1
     Scenario: Create an account
       When the user click create an account link
       Then the user verifies the title of the open page

@@ -3,7 +3,7 @@ Feature: filters
   Background:
     Given The user is logged in
 
-    @color-price-filter
+    @color-price-filter @wip
     Scenario: Check color Filter
       When The user clicks women dropdown
       And The user selects jacket option under tops dropdown
